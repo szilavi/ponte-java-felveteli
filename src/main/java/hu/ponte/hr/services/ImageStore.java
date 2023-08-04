@@ -22,7 +22,7 @@ import java.util.Optional;
 public class ImageStore {
     private final SignService signService;
     private final List<ImageMeta> images = new ArrayList<>(); // Metaadatok tárolása.
-    private final Map<String, byte[]> imageData = new HashMap<>(); // Képek biteadatai.
+    private final Map<String, byte[]> imageData = new HashMap<>(); // Képek byteadatai.
 
     @Autowired
     public ImageStore(SignService signService) {
@@ -38,7 +38,7 @@ public class ImageStore {
         byte[] fileBytes = file.getBytes();
         String digitalSign = signService.sign(fileBytes); // Ez felel a digitális aláírásért.
 
-        String path = "C:/Users/V2/Desktop/" + name; // FONTOS!!!!!! EZT ITT ÁT KELL ÍRNI, HOGY HOVA MENTSE!!!!!!
+        String path = "C:/Users/Username/Desktop/" + name; // FONTOS!!!!!! EZT ITT ÁT KELL ÍRNI, HOGY HOVA MENTSE!!!!!!
 
         ImageMeta imageMeta = ImageMeta.builder()
                 .id(id)
@@ -50,7 +50,7 @@ public class ImageStore {
                 .build();
 
         images.add(imageMeta); // Metaadatok hozzáadása
-        imageData.put(id, fileBytes); // Bytok hozzáadása a maphez
+        imageData.put(id, fileBytes); // Byteok hozzáadása a maphez
 
         Files.write(Paths.get(path), fileBytes); // Filerendszerbe mentés
     }
