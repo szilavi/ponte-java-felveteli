@@ -10,12 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class ImageService {
     private final SignService signService;
-    private final List<ImageDetails> images = new ArrayList<>(); // Metaadatok tárolása.
-    private final Map<String, byte[]> imageData = new HashMap<>(); // Képek biteadatai.
+    private final List<ImageDetails> images = new CopyOnWriteArrayList<>(); // Metaadatok tárolása.
+    private final Map<String, byte[]> imageData = new ConcurrentHashMap<>(); // Képek biteadatai.
 
     @Autowired
     public ImageService(SignService signService) {

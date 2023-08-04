@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/api/file")
 public class UploadController
 {
     private static final long MAX_FILE_SIZE = 2 * 1024 * 1024L; // 2MB
@@ -27,7 +27,7 @@ public class UploadController
     }
 
     // api/file/post-ra érkező kérések
-    @PostMapping
+    @PostMapping("/post")
     public ResponseEntity<String> handleFormUpload(@RequestParam("file") MultipartFile file) {
 
         if (file.getSize() > MAX_FILE_SIZE) {
@@ -41,6 +41,8 @@ public class UploadController
         } catch (IOException e) {
             log.error("Hiba történt a képfájl mentésekor.", e);
             return new ResponseEntity<>("Hiba történt a képfájl mentésekor.", HttpStatus.FORBIDDEN);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("hiba a fájl aláírásakor", HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<>("Image uploaded successfully!", HttpStatus.CREATED);

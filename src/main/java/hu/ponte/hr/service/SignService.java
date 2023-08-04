@@ -2,11 +2,11 @@ package hu.ponte.hr.service;
 
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.Signature;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
