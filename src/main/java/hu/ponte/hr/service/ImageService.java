@@ -1,31 +1,24 @@
-package hu.ponte.hr.services;
+package hu.ponte.hr.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import hu.ponte.hr.controller.ImageMeta;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import hu.ponte.hr.dto.ImageDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
-public class ImageStore {
+public class ImageService {
     private final SignService signService;
-    private final List<ImageMeta> images = new ArrayList<>(); // Metaadatok tárolása.
+    private final List<ImageDetails> images = new ArrayList<>(); // Metaadatok tárolása.
     private final Map<String, byte[]> imageData = new HashMap<>(); // Képek biteadatai.
 
     @Autowired
-    public ImageStore(SignService signService) {
+    public ImageService(SignService signService) {
         this.signService = signService;
     }
 
@@ -40,7 +33,7 @@ public class ImageStore {
 
         String path = "C:/Users/V2/Desktop/" + name; // FONTOS!!!!!! EZT ITT ÁT KELL ÍRNI, HOGY HOVA MENTSE!!!!!!
 
-        ImageMeta imageMeta = ImageMeta.builder()
+        ImageDetails imageDetails = ImageDetails.builder()
                 .id(id)
                 .name(name)
                 .mimeType(mimeType)
@@ -49,36 +42,28 @@ public class ImageStore {
                 .path(path)
                 .build();
 
-        images.add(imageMeta); // Metaadatok hozzáadása
+        images.add(imageDetails); // Metaadatok hozzáadása
         imageData.put(id, fileBytes); // Bytok hozzáadása a maphez
 
         Files.write(Paths.get(path), fileBytes); // Filerendszerbe mentés
     }
 
     // Az összes metaadat lekérdezése
-    public List<ImageMeta> getAllImagesMeta() {
+    public List<ImageDetails> getAllImagesMeta() {
         return new ArrayList<>(images);
     }
 
     // Egy kép lekérdezése ID alapján
-    public ResponseEntity<byte[]> getImage(String id, HttpServletResponse response) {
-        Optional<ImageMeta> optionalImageMeta = images.stream()
-                .filter(imageMeta -> imageMeta.getId().equals(id))
-                .findFirst();
+    public ImageDetails getImage(String id) throws IOException, NoSuchElementException {
+        ImageDetails imageDetails = images.stream()
+                .filter(image -> image.getId().equals(id))
+                .findFirst().orElseThrow();
+
+        imageDetails.setFile(Files.readAllBytes(Paths.get(imageDetails.getPath())));
 
         // Ha megvan a kép, beolvassa a filet és a válasz tartalma is elkészül.
-        if (optionalImageMeta.isPresent()) {
-            ImageMeta imageMeta = optionalImageMeta.get();
-            byte[] imageBytes = new byte[0];
-            try {
-                imageBytes = Files.readAllBytes(Paths.get(imageMeta.getPath()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (imageBytes.length > 0) {
-                return ResponseEntity.ok().contentType(MediaType.parseMediaType(imageMeta.getMimeType())).body(imageBytes);
-            }
-        }
-        return ResponseEntity.notFound().build(); // NotFound státuszkód, ha nincs meg a kép.
+
+        // NotFound státuszkód, ha nincs meg a kép.
+        return imageDetails;
     }
 }

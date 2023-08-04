@@ -1,4 +1,4 @@
-package hu.ponte.hr.services;
+package hu.ponte.hr.service;
 
 import org.springframework.stereotype.Service;
 
@@ -36,6 +36,7 @@ public class SignService {
 
         } catch (Exception e) {
             // Kivételt dobunk, ha baj van.
+            //Generikus kivételt nem célszerű, hol kapjuk el? mit kezdünk vele? by Levi
             throw new RuntimeException("Could not sign the data", e);
         }
     }
